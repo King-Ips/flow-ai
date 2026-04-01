@@ -32,16 +32,29 @@
       <ul id="timeline-list" class="timeline"></ul>
     </section>
 
+        <!-- Add Task Form -->
     <div class="add-task-form">
       <h3>Add New Task</h3>
       <input type="text" id="task-title" placeholder="What do you need to do?" required>
+      
       <div class="time-inputs">
         <input type="time" id="task-start" required>
         <span>to</span>
         <input type="time" id="task-end" required>
       </div>
+
+      <!-- NEW: Priority selector -->
+      <select id="task-priority" style="width:100%; padding:14px; margin:10px 0; border:2px solid #a5d6ff; border-radius:12px; font-size:1.1rem;">
+        <option value="high">🔴 High Priority</option>
+        <option value="medium" selected>🟠 Medium Priority</option>
+        <option value="low">🟢 Low Priority</option>
+      </select>
+
       <button id="add-task-btn">Add to Schedule</button>
     </div>
+
+
+
 
     <button id="voice-btn" class="voice-btn" title="Voice coming in Phase 3">
       🎤
