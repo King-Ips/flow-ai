@@ -1,36 +1,34 @@
-// js/app.js - Phase 1 (Classic version - super simple)
+// js/app.js - Phase 1.5 (Smart Dashboard + Scheduler Engine)
 
 let tasks = [];
 
-// Run when page loads
+// ====================== INIT ======================
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("%c🚀 FlowAI Phase 1 started (classic version)", "color:#1e3a5f; font-size:18px; font-weight:bold");
+  console.log("%c🚀 FlowAI Phase 1.5 started - Smart Dashboard", "color:#1e3a5f; font-size:18px; font-weight:bold");
 
   loadTasks();
   startLiveClock();
   showGreeting();
   renderTimeline();
+  updateDashboard();                    // ← NEW: show Now & Next immediately
 
   // Connect Add Task button
   document.getElementById("add-task-btn").addEventListener("click", addNewTask);
 
-  console.log("✅ App ready! Add a task to test.");
+  console.log("✅ Smart Dashboard ready!");
 });
 
 // ====================== LOAD / SAVE ======================
 function loadTasks() {
   const saved = localStorage.getItem("flowai-tasks");
-  if (saved) {
-    tasks = JSON.parse(saved);
-    console.log("📂 Loaded", tasks.length, "tasks from storage");
-  }
+  if (saved) tasks = JSON.parse(saved);
 }
 
 function saveTasks() {
   localStorage.setItem("flowai-tasks", JSON.stringify(tasks));
 }
 
-// ====================== LIVE CLOCK ======================
+// ====================== LIVE CLOCK + DASHBOARD ======================
 function startLiveClock() {
   const timeEl = document.getElementById("current-time");
 
@@ -39,11 +37,12 @@ function startLiveClock() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     timeEl.textContent = `${hours}:${minutes}`;
+
+    updateDashboard();        // ← Every minute we also refresh Now/Next
   }
 
   updateClock();
-  setInterval(updateClock, 60000);   // every minute
-  console.log("⏰ Live clock started");
+  setInterval(updateClock, 60000);
 }
 
 // ====================== GREETING ======================
@@ -57,7 +56,6 @@ function showGreeting() {
   else text += "evening";
 
   greetingEl.textContent = `${text}, Ipeleng! 👋`;
-  console.log("👋 Greeting shown");
 }
 
 // ====================== TIMELINE ======================
@@ -79,6 +77,67 @@ function renderTimeline() {
   });
 }
 
+// ====================== NEW: SMART DASHBOARD (Now + Next) ======================
+function updateDashboard() {
+  const currentText = document.getElementById("current-task-text");
+  const nextText = document.getElementById("next-task-text");
+
+  if (tasks.length === 0) {
+    currentText.textContent = "No tasks yet";
+    nextText.textContent = "Add tasks to get started";
+    return;
+  }
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  let currentTask = null;
+  let nextTask = null;
+
+  for (let i = 0; i < tasks.length; i++) {
+    const taskStart = parseTimeToMinutes(tasks[i].start);
+    const taskEnd   = parseTimeToMinutes(tasks[i].end);
+
+    // Is this task happening RIGHT NOW?
+    if (currentMinutes >= taskStart && currentMinutes < taskEnd) {
+      currentTask = tasks[i];
+      nextTask = tasks[i + 1] || null;   // next one after this
+      break;
+    }
+
+    // If we passed this task, the next one is the candidate
+    if (currentMinutes < taskStart) {
+      nextTask = tasks[i];
+      break;
+    }
+  }
+
+  // If no current task but we have future tasks
+  if (!currentTask && !nextTask && tasks.length > 0) {
+    nextTask = tasks[0];
+  }
+
+  // Update "Now" card
+  if (currentTask) {
+    currentText.innerHTML = `<strong>${currentTask.title}</strong><br><small>${currentTask.start} – ${currentTask.end}</small>`;
+  } else {
+    currentText.textContent = "Free time";
+  }
+
+  // Update "Next" card
+  if (nextTask) {
+    nextText.innerHTML = `<strong>${nextTask.title}</strong><br><small>${nextTask.start} – ${nextTask.end}</small>`;
+  } else {
+    nextText.textContent = "Day complete ✓";
+  }
+}
+
+// Helper: convert "HH:MM" to minutes since midnight
+function parseTimeToMinutes(timeStr) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
 // ====================== ADD TASK ======================
 function addNewTask() {
   const title = document.getElementById("task-title").value.trim();
@@ -97,16 +156,16 @@ function addNewTask() {
     end
   });
 
-  // Sort by start time
   tasks.sort((a, b) => a.start.localeCompare(b.start));
 
   saveTasks();
   renderTimeline();
+  updateDashboard();        // ← Refresh Now/Next immediately
 
-  // Clear the form
+  // Clear form
   document.getElementById("task-title").value = "";
   document.getElementById("task-start").value = "";
   document.getElementById("task-end").value = "";
 
-  console.log("✅ Task added:", title);
+  console.log("✅ Task added and dashboard updated:", title);
 }
