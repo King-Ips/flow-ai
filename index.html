@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowAI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>🌥️ FlowAI</h1>
+      <div id="current-time" class="time"></div>
+    </header>
+
+    <!-- Greeting -->
+    <h2 id="greeting" class="greeting"></h2>
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+      <div class="card current-task">
+        <h3>Now</h3>
+        <p id="current-task-text" class="task-text">No tasks yet</p>
+      </div>
+
+      <div class="card next-task">
+        <h3>Next</h3>
+        <p id="next-task-text" class="task-text">Add your first task below 👇</p>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <section class="timeline-section">
+      <h3>Today's Timeline</h3>
+      <ul id="timeline-list" class="timeline"></ul>
+    </section>
+
+    <!-- Add Task Form -->
+    <div class="add-task-form">
+      <h3>Add New Task</h3>
+      <input type="text" id="task-title" placeholder="What do you need to do?" required>
+      <div class="time-inputs">
+        <input type="time" id="task-start" required>
+        <span>to</span>
+        <input type="time" id="task-end" required>
+      </div>
+      <button id="add-task-btn">Add to Schedule</button>
+    </div>
+
+    <!-- Floating Mic (styled but not active yet) -->
+    <button id="voice-btn" class="voice-btn" title="Voice coming in Phase 3">
+      🎤
+    </button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
