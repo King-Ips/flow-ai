@@ -1,32 +1,3 @@
-flow-ai/
-├── index.html                 # Main entry point – loads everything
-├── style.css                  # Cloud/sky aesthetic, animations, mobile-friendly
-├── script.js                  # Tiny loader that starts app.js
-│
-├── /js/
-│   ├── app.js                 # Main controller – glues everything together
-│   ├── scheduler.js           # Add, edit, delete, sort tasks
-│   ├── timeEngine.js          # The heart: runs every minute, checks time, triggers events
-│   ├── notifications.js       # Decides what reminder/alert to show/speak
-│   ├── voice.js               # SpeechRecognition (input) + SpeechSynthesis (output)
-│   └── utils.js               # Helper functions (time formatting, etc.)
-│
-├── /assets/
-│   ├── icons/                 # Mic icon, clock, etc.
-│   └── images/                # Background cloud images (optional)
-│
-├── /data/
-│   └── sampleSchedule.json    # Fake data for testing
-│
-├── /docs/
-│   ├── architecture.md
-│   └── api.md
-│
-├── README.md
-├── .gitignore
-└── LICENSE (optional)
-
-
 
 **What each file actually does (simple explanation)**
 
@@ -55,6 +26,8 @@ flow-ai/
 ---
 
 
+
+---
 
 ### Issues (GitHub Issues Template – Copy These)
 
@@ -100,3 +73,7 @@ or
 **“Explain anything again”** if you want me to go deeper on any part first.
 
 I’m here to teach you, not just give code. Take your time – whenever you’re ready, we begin. 🚀
+
+
+
+
