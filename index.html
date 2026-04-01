@@ -4,69 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlowAI</title>
-  
-  <!-- Link to main CSS file -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    
-    <!-- Header section: App title and current time display -->
     <header>
       <h1>🌥️ FlowAI</h1>
       <div id="current-time" class="time"></div>
     </header>
 
-    <!-- Greeting message: dynamically updated based on time of day -->
     <h2 id="greeting" class="greeting"></h2>
 
-    <!-- Dashboard showing current and next task -->
     <div class="dashboard">
-      
-      <!-- Current task card -->
       <div class="card current-task">
         <h3>Now</h3>
         <p id="current-task-text" class="task-text">No tasks yet</p>
       </div>
 
-      <!-- Next task card -->
       <div class="card next-task">
         <h3>Next</h3>
         <p id="next-task-text" class="task-text">Add your first task below 👇</p>
       </div>
     </div>
 
-    <!-- Timeline section: shows full day's schedule -->
     <section class="timeline-section">
       <h3>Today's Timeline</h3>
       <ul id="timeline-list" class="timeline"></ul>
     </section>
 
-    <!-- Add Task Form: user can input new tasks -->
     <div class="add-task-form">
       <h3>Add New Task</h3>
-      
-      <!-- Task title input -->
       <input type="text" id="task-title" placeholder="What do you need to do?" required>
-      
-      <!-- Task start and end times -->
       <div class="time-inputs">
         <input type="time" id="task-start" required>
         <span>to</span>
         <input type="time" id="task-end" required>
       </div>
-      
-      <!-- Button to add task to schedule -->
       <button id="add-task-btn">Add to Schedule</button>
     </div>
 
-    <!-- Floating voice button (planned for Phase 3) -->
     <button id="voice-btn" class="voice-btn" title="Voice coming in Phase 3">
       🎤
     </button>
   </div>
 
-  <!-- Main JavaScript file -->
-  <script src="script.js"></script>
+  <!-- Classic script - no module complications -->
+  <script src="js/app.js"></script>
 </body>
 </html>
