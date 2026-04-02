@@ -28,3 +28,4 @@ We build **step-by-step** so you fully understand every piece:
 - Documentation & README final touches  
 
 After each phase I’ll explain **exactly** what we just built and why it matters before we move to the next.
+

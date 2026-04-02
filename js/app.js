@@ -1,6 +1,8 @@
 // js/app.js - Phase 2 - Scheduler Engine (Full task management)
 
-let tasks = [];
+const AppState = {
+  tasks: []
+};
 
 // ====================== INIT ======================
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   renderTimeline();
   updateDashboard();
 
-  document.getElementById("add-task-btn").addEventListener("click", addNewTask);
+  const addBtn = document.getElementById("add-task-btn");
+  if (addBtn) addBtn.addEventListener("click", addNewTask);
+  else console.warn("Add task button not found");
 
   console.log("✅ Scheduler Engine ready! Add, edit, or delete tasks.");
 });
@@ -20,16 +24,25 @@ document.addEventListener("DOMContentLoaded", () => {
 // ====================== LOAD / SAVE ======================
 function loadTasks() {
   const saved = localStorage.getItem("flowai-tasks");
-  if (saved) tasks = JSON.parse(saved);
+  try {
+    if (saved) AppState.tasks = JSON.parse(saved) || [];
+  } catch (e) {
+    console.error("Corrupted data, resetting...");
+    AppState.tasks = [];
+  }
 }
 
 function saveTasks() {
-  localStorage.setItem("flowai-tasks", JSON.stringify(tasks));
+  localStorage.setItem("flowai-tasks", JSON.stringify(AppState.tasks));
 }
 
 // ====================== LIVE CLOCK ======================
 function startLiveClock() {
   const timeEl = document.getElementById("current-time");
+  if (!timeEl) {
+    console.warn("Current time element not found");
+    return;
+  } 
   function updateClock() {
     const now = new Date();
     timeEl.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
@@ -42,7 +55,11 @@ function startLiveClock() {
 // ====================== GREETING ======================
 function showGreeting() {
   const greetingEl = document.getElementById("greeting");
-  const hour = new Date().getHours();
+  if (!greetingEl) {
+    console.warn("Greeting element not found");
+    return;
+  }
+  const hour = new Date().getHours(); 
   let text = "Good ";
   if (hour < 12) text += "morning";
   else if (hour < 18) text += "afternoon";
@@ -53,14 +70,18 @@ function showGreeting() {
 // ====================== TIMELINE (now with edit/delete) ======================
 function renderTimeline() {
   const list = document.getElementById("timeline-list");
+  if (!list) {
+    console.warn("Timeline list element not found");
+    return;
+  }
   list.innerHTML = "";
 
-  if (tasks.length === 0) {
+  if (AppState.tasks.length === 0) {
     list.innerHTML = `<li style="text-align:center; color:#999; padding:30px 20px;">No tasks yet.<br>Add one above! 👆</li>`;
     return;
   }
 
-  tasks.forEach((task, index) => {
+  AppState.tasks.forEach((task, index) => {
     const duration = calculateDuration(task.start, task.end);
     const priorityColor = getPriorityColor(task.priority || "medium");
 
@@ -109,7 +130,25 @@ function addNewTask() {
     return;
   }
 
-  tasks.push({
+  // Validate times
+  if (!isValidTime(start) || !isValidTime(end)) {
+    alert("Invalid time format! Use HH:MM (00:00-23:59)");
+    return;
+  }
+
+  // Check for overlaps
+const startMins = parseTimeToMinutes(start);
+const endMins = parseTimeToMinutes(end);
+const overlap = AppState.tasks.some(t =>
+  startMins < parseTimeToMinutes(t.end) && endMins > parseTimeToMinutes(t.start)
+);
+
+  if (overlap) {
+    alert("Task overlaps with existing task. Adjust times.");
+    return;
+  }
+
+  AppState.tasks.push({
     id: Date.now(),
     title,
     start,
@@ -117,15 +156,30 @@ function addNewTask() {
     priority
   });
 
-  tasks.sort((a, b) => a.start.localeCompare(b.start));
+  // Sort safety
+  if (AppState.tasks.every(t => isValidTime(t.start) && isValidTime(t.end))) {
+    AppState.tasks.sort((a, b) => a.start.localeCompare(b.start));
+  } else {
+    console.error("Invalid task times - sort skipped");
+  }
   saveTasks();
   renderTimeline();
   updateDashboard();
 
-  // Clear form
+// Clear form
   document.getElementById("task-title").value = "";
   document.getElementById("task-start").value = "";
   document.getElementById("task-end").value = "";
+  
+  // Feedback
+  const form = document.querySelector('.add-task-form');
+  if (form) {
+    form.style.background = '#d4edda';
+    form.style.transition = 'background 0.3s';
+    setTimeout(() => {
+      form.style.background = 'white';
+    }, 1500);
+  }
 
   console.log("✅ Task added:", title);
 }
@@ -134,7 +188,7 @@ function addNewTask() {
 function handleDelete(e) {
   if (!confirm("Delete this task?")) return;
   const index = parseInt(e.target.dataset.index);
-  tasks.splice(index, 1);
+  AppState.tasks.splice(index, 1);
   saveTasks();
   renderTimeline();
   updateDashboard();
@@ -143,7 +197,7 @@ function handleDelete(e) {
 // ====================== EDIT TASK ======================
 function handleEdit(e) {
   const index = parseInt(e.target.dataset.index);
-  const task = tasks[index];
+  const task = AppState.tasks[index]; 
 
   const newTitle = prompt("Edit task title:", task.title);
   if (newTitle === null) return;
@@ -152,22 +206,61 @@ function handleEdit(e) {
   const newEnd = prompt("Edit end time (HH:MM):", task.end);
   const newPriority = prompt("Priority (high/medium/low):", task.priority || "medium");
 
+  if (!newStart || !newEnd) {
+    alert("Start and end times required!");
+    return;
+  }
+  if (!isValidTime(newStart) || !isValidTime(newEnd)) {
+    alert("Invalid time format! Use HH:MM (00:00-23:59)");
+    return;
+  }
+  if (parseTimeToMinutes(newEnd) <= parseTimeToMinutes(newStart)) {
+    alert("End time must be after start time!");
+    return;
+  }
+
+  // Check overlaps
+  const overlap = AppState.tasks.some((t, idx) => idx !== index && newStart < t.end && newEnd > t.start);
+  if (overlap) {
+    alert("New times overlap with another task. Adjust.");
+    return;
+  } 
+
   if (newStart && newEnd && parseTimeToMinutes(newEnd) > parseTimeToMinutes(newStart)) {
     task.title = newTitle.trim();
     task.start = newStart;
     task.end = newEnd;
     task.priority = newPriority.toLowerCase();
     
-    tasks.sort((a, b) => a.start.localeCompare(b.start));
+    // Sort safety
+    if (AppState.tasks.every(t => isValidTime(t.start) && isValidTime(t.end))) {
+      AppState.tasks.sort((a, b) => a.start.localeCompare(b.start));
+    } else {
+      console.error("Invalid task times - sort skipped");
+    }
     saveTasks();
     renderTimeline();
     updateDashboard();
+    
+    // Feedback for edit
+    const form = document.querySelector('.add-task-form');
+    if (form) {
+      form.style.background = '#d1ecf1';
+      setTimeout(() => form.style.background = 'white', 1000);
+    }
   } else {
     alert("Invalid times or end must be after start!");
   }
 }
 
 // ====================== HELPERS ======================
+function isValidTime(timeStr) {
+  const regex = /^\d{2}:\d{2}$/;
+  if (!regex.test(timeStr)) return false;
+  const [h, m] = timeStr.split(":").map(Number);
+  return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+}
+
 function calculateDuration(start, end) {
   const s = parseTimeToMinutes(start);
   const e = parseTimeToMinutes(end);
@@ -183,6 +276,10 @@ function getPriorityColor(priority) {
 
 function parseTimeToMinutes(timeStr) {
   const [h, m] = timeStr.split(":").map(Number);
+  if (isNaN(h) || isNaN(m)) {
+    console.warn("Invalid time:", timeStr);
+    return 0;
+  }
   return h * 60 + m;
 }
 
@@ -190,8 +287,12 @@ function parseTimeToMinutes(timeStr) {
 function updateDashboard() {
   const currentText = document.getElementById("current-task-text");
   const nextText = document.getElementById("next-task-text");
+  if (!currentText || !nextText) {
+    console.warn("Dashboard elements not found");
+    return;
+  }
 
-  if (tasks.length === 0) {
+  if (AppState.tasks.length === 0) {
     currentText.textContent = "No tasks yet";
     nextText.textContent = "Add tasks to get started";
     return;
@@ -203,22 +304,25 @@ function updateDashboard() {
   let currentTask = null;
   let nextTask = null;
 
-  for (let i = 0; i < tasks.length; i++) {
-    const taskStart = parseTimeToMinutes(tasks[i].start);
-    const taskEnd   = parseTimeToMinutes(tasks[i].end);
+  for (let i = 0; i < AppState.tasks.length; i++) {
+    const taskStart = parseTimeToMinutes(AppState.tasks[i].start);
+    const taskEnd   = parseTimeToMinutes(AppState.tasks[i].end); 
 
-    if (currentMinutes >= taskStart && currentMinutes < taskEnd) {
-      currentTask = tasks[i];
-      nextTask = tasks[i + 1] || null;
+    if (currentMinutes >= taskStart && currentMinutes <= taskEnd) {
+       currentTask = AppState.tasks[i];
+       nextTask = AppState.tasks[i + 1] || null;
       break;
     }
     if (currentMinutes < taskStart) {
-      nextTask = tasks[i];
+      nextTask = AppState.tasks[i];
       break;
-    }
+    } 
   }
-
-  if (!currentTask && tasks.length > 0) nextTask = tasks[0];
+  
+  if (!currentTask && !nextTask && AppState.tasks.length > 0) {
+    const first = AppState.tasks[0];
+    if (parseTimeToMinutes(first.start) > currentMinutes) nextTask = first;
+  }
 
   if (currentTask) {
     currentText.innerHTML = `<strong>${currentTask.title}</strong><br><small>${currentTask.start}–${currentTask.end}</small>`;
