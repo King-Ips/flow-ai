@@ -8,9 +8,9 @@
 /* ---------------- Body ---------------- */
 body {
   font-family: 'Segoe UI', system-ui, sans-serif; /* clean, modern font */
-  background: linear-gradient(180deg, #a5d6ff 0%, #e0f0ff 100%); /* gradient background */
+  background: black; /* gradient background */
   min-height: 100vh; /* ensures full viewport height */
-  color: #1e3a5f; /* main text color */
+  color: #5f5c5c; /* main text color */
 }
 
 /* ---------------- Container ---------------- */
@@ -64,7 +64,7 @@ h1 {
 
 /* ---------------- Task Cards ---------------- */
 .card {
-  background: white;
+  background: rgb(47, 107, 27);
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
