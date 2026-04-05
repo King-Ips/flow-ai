@@ -4,67 +4,80 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FlowAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
+
     <header>
-      <h1>📌 FlowAI</h1>
-      <div id="current-time" class="time"></div>
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="2" y="2" width="6" height="6" rx="1.5" fill="#0d0f14"/>
+            <rect x="10" y="2" width="6" height="6" rx="1.5" fill="#0d0f14" opacity="0.55"/>
+            <rect x="2" y="10" width="6" height="6" rx="1.5" fill="#0d0f14" opacity="0.55"/>
+            <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#0d0f14" opacity="0.28"/>
+          </svg>
+        </div>
+        <h1>FlowAI</h1>
+      </div>
+      <div id="current-time" class="time-pill"></div>
     </header>
 
     <h2 id="greeting" class="greeting"></h2>
 
     <div class="dashboard">
       <div class="card current-task">
-        <h3>Now</h3>
-        <p id="current-task-text" class="task-text">No tasks yet</p>
+        <div class="card-label">
+          <span class="label-dot"></span>Now
+        </div>
+        <p id="current-task-text" class="task-text">No active task</p>
       </div>
-
       <div class="card next-task">
-        <h3>Next</h3>
-        <p id="next-task-text" class="task-text">Add your first task below 👇</p>
+        <div class="card-label">Up next</div>
+        <p id="next-task-text" class="task-text">Add tasks below</p>
       </div>
     </div>
 
     <section class="timeline-section">
-      <h3>Today's Timeline</h3>
+      <div class="section-header">
+        <span class="section-title">Today's Schedule</span>
+        <span id="task-count" class="task-count">0 tasks</span>
+      </div>
       <ul id="timeline-list" class="timeline"></ul>
     </section>
 
-        <!-- Add Task Form -->
     <div class="add-task-form">
-      <h3>Add New Task</h3>
-      <input type="text" id="task-title" placeholder="What do you need to do?" required>
-      
+      <div class="form-title">Add New Task</div>
+
+      <input type="text" id="task-title" placeholder="What do you need to accomplish?" autocomplete="off">
+
       <div class="time-inputs">
-        <input type="time" id="task-start" required>
-        <span>to</span>
-        <input type="time" id="task-end" required>
+        <div class="time-field">
+          <label>Start</label>
+          <input type="time" id="task-start">
+        </div>
+        <div class="time-arrow">→</div>
+        <div class="time-field">
+          <label>End</label>
+          <input type="time" id="task-end">
+        </div>
       </div>
 
-
-
-
-      <!-- NEW: Priority selector ---->
-      <select id="task-priority" style="width:100%; padding:14px; margin:10px 0; border:2px solid #a5d6ff; border-radius:12px; font-size:1.1rem;">
-        <option value="high">🔴 High Priority</option>
-        <option value="medium" selected>🟠 Medium Priority</option>
-        <option value="low">🟢 Low Priority</option>
+      <select id="task-priority">
+        <option value="high">High Priority</option>
+        <option value="medium" selected>Medium Priority</option>
+        <option value="low">Low Priority</option>
       </select>
 
       <button id="add-task-btn">Add to Schedule</button>
     </div>
 
-
-
-
-    <button id="voice-btn" class="voice-btn" title="Click and Speak to FlowAi">
-      🎤
-    </button>
   </div>
 
-  <!-- Classic script - no module complications -->
-  <script src="js/app.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
