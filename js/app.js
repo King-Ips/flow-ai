@@ -5,7 +5,8 @@ const AppState = {
 };
 
 // ====================== INIT ======================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => 
+  {
   console.log("%c🚀 FlowAI Phase 2 started - Scheduler Engine", "color:#1e3a5f; font-size:18px; font-weight:bold");
 
   loadTasks();
@@ -17,6 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.getElementById("add-task-btn");
   if (addBtn) addBtn.addEventListener("click", addNewTask);
   else console.warn("Add task button not found");
+
+
+  // Initialize voice engine (Phase 3, but safe to call now) - START VOICE ENGINE
+  initVoiceEngine(); 
+
 
   console.log("✅ Scheduler Engine ready! Add, edit, or delete tasks.");
 });
@@ -284,7 +290,8 @@ function parseTimeToMinutes(timeStr) {
 }
 
 // ====================== SMART DASHBOARD (unchanged from Phase 1.5) ======================
-function updateDashboard() {
+function updateDashboard() 
+{
   const currentText = document.getElementById("current-task-text");
   const nextText = document.getElementById("next-task-text");
   if (!currentText || !nextText) {
@@ -334,5 +341,108 @@ function updateDashboard() {
     nextText.innerHTML = `<strong>${nextTask.title}</strong><br><small>${nextTask.start}–${nextTask.end}</small>`;
   } else {
     nextText.textContent = "Day complete ✓";
+  }
+}
+
+// ====================== PHASE 3: VOICE ENGINE (Global Scope) ======================
+// This is now correctly placed outside any function so it can be used by the button
+
+function getCurrentTask() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  return AppState.tasks.find(task => {
+    const start = parseTimeToMinutes(task.start);
+    const end = parseTimeToMinutes(task.end);
+    return currentMinutes >= start && currentMinutes <= end;
+  });
+}
+
+function getNextTask() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  return AppState.tasks.find(task => parseTimeToMinutes(task.start) > currentMinutes);
+}
+
+// Main voice initialization
+function initVoiceEngine() {
+  const voiceBtn = document.getElementById("voice-btn");
+  if (!voiceBtn) {
+    console.warn("Voice button not found");
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.warn("⚠️ Voice not supported. Please use Google Chrome.");
+    voiceBtn.style.opacity = "0.5";
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";   // Change to "en-ZA" later if you want
+
+  voiceBtn.addEventListener("click", () => {
+    try {
+      recognition.start();
+      voiceBtn.classList.add("listening");
+      voiceBtn.textContent = "🔴";
+      console.log("🎤 Listening...");
+    } catch (err) {
+      console.error("Voice start failed:", err);
+      speak("Sorry, microphone access failed.");
+    }
+  });
+
+  recognition.onresult = (event) => {
+    const spokenText = event.results[0][0].transcript.trim().toLowerCase();
+    console.log("🗣️ You said:", spokenText);
+    handleVoiceCommand(spokenText);
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Voice error:", event.error);
+    speak("Sorry, I didn't catch that. Try again.");
+  };
+
+  recognition.onend = () => {
+    voiceBtn.classList.remove("listening");
+    voiceBtn.textContent = "🎤";
+  };
+}
+
+// Handle what the user said
+function handleVoiceCommand(command) {
+  speak("Got it!");   // instant feedback
+
+  if (command.includes("what's next") || command.includes("next task")) {
+    const nextTask = getNextTask();
+    speak(nextTask ? `Next is ${nextTask.title} at ${nextTask.start}` : "No more tasks today.");
+  } 
+  else if (command.includes("what am i doing") || command.includes("now") || command.includes("current")) {
+    const currentTask = getCurrentTask();
+    speak(currentTask ? `You should be doing ${currentTask.title}` : "You have free time right now.");
+  } 
+  else if (command.includes("add")) {
+    speak("Voice adding tasks is coming next phase. Use the form for now.");
+  } 
+  else {
+    speak("Sorry, I didn't understand. Try 'what's next' or 'what am I doing now'.");
+  }
+}
+
+// Text-to-speech (safe)
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  try {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.95;
+    utterance.pitch = 1.05;
+    speechSynthesis.speak(utterance);
+  } catch (err) {
+    console.error("Speak failed:", err);
   }
 }

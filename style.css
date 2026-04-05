@@ -8,9 +8,9 @@
 /* ---------------- Body ---------------- */
 body {
   font-family: 'Segoe UI', system-ui, sans-serif; /* clean, modern font */
-  background: black; /* gradient background */
+  background: rgb(216, 73, 7); /* gradient background */
   min-height: 100vh; /* ensures full viewport height */
-  color: #5f5c5c; /* main text color */
+  color: #0a0707; /* main text color */
 }
 
 /* ---------------- Container ---------------- */
@@ -41,10 +41,10 @@ h1 {
 .time {
   font-size: 1.4rem;
   font-weight: 600;
-  background: rgba(255,255,255,0.9);
+  background: rgba(247, 246, 246, 0.9);
   padding: 8px 16px;
   border-radius: 50px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(7, 117, 31, 0.1);
 }
 
 /* ---------------- Greeting ---------------- */
@@ -64,15 +64,15 @@ h1 {
 
 /* ---------------- Task Cards ---------------- */
 .card {
-  background: rgb(47, 107, 27);
+  background: rgb(24, 24, 22);
   padding: 20px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(155, 9, 9, 0.1);
 }
 
 .current-task h3, .next-task h3 {
   font-size: 1.1rem;
-  color: #666;
+  color: #f1eaea;
   margin-bottom: 8px;
 }
 
@@ -89,10 +89,10 @@ h1 {
 
 .timeline {
   list-style: none; /* remove bullets */
-  background: white;
+  background: rgb(223, 88, 88);
   border-radius: 20px;
   padding: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(29, 15, 15, 0.1);
 }
 
 .timeline li {
@@ -153,7 +153,7 @@ h1 {
   right: 30px;
   width: 70px;
   height: 70px;
-  background: #ff6b6b;
+  background: #d82727;
   color: white;
   border: none;
   border-radius: 50%;
@@ -161,4 +161,16 @@ h1 {
   box-shadow: 0 10px 30px rgba(255,107,107,0.4);
   cursor: pointer;
   z-index: 100; /* above all content */
+}
+
+/* ---------------- Voice Button Animation (Phase 3) ---------------- */
+.voice-btn.listening {
+  background: #ff4444;
+  animation: pulse 1.5s infinite;
+  transform: scale(1.1);
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
+  70%  { box-shadow: 0 0 0 25px rgba(255, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
 }
